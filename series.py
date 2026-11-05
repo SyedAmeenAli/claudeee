@@ -225,7 +225,7 @@ def caption(text):
 def title_card(ep, name):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(lay)
-    for txt, f, y, c in [("THE LAST SIGNAL", serif(52), 200, (255, 60, 50)),
+    for txt, f, y, c in [("THE LAST SIGNAL", serif(42), 200, (255, 60, 50)),
                          (f"EPISODE {ep}", font(26), 280, (255, 255, 255)),
                          (name, serif(36), 320, (255, 220, 200))]:
         bw = d.textbbox((0, 0), txt, font=f)[2]
@@ -247,15 +247,15 @@ def end_card(ep):
 def voice(lines, out):
     from kokoro_onnx import Kokoro
     k = Kokoro(os.path.join(KD, "k.onnx"), os.path.join(KD, "voices.bin"))
-    chunks, spans, t = [np.zeros(int(SR * 3.0))], [], 3.0  # 3s title intro
+    chunks, spans, t = [np.zeros(int(SR * 4.0))], [], 4.0  # 3s title intro
     for _, s in lines:
-        a, sr = k.create(s, voice="am_onyx", speed=0.9, lang="en-us")
+        a, sr = k.create(s, voice="am_onyx", speed=0.8, lang="en-us")
         if sr != SR:
             raise SystemExit("unexpected sample rate")
         spans.append((t, t + len(a) / SR))
-        chunks += [a, np.zeros(int(SR * 0.7))]
-        t += len(a) / SR + 0.7
-    chunks.append(np.zeros(int(SR * 4.0)))  # end card
+        chunks += [a, np.zeros(int(SR * 1.5))]
+        t += len(a) / SR + 1.5
+    chunks.append(np.zeros(int(SR * 5.0)))  # end card
     v = np.concatenate(chunks).astype(np.float32)
     sf.write(out, v, SR)
     return spans, len(v) / SR
